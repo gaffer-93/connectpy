@@ -1,0 +1,15 @@
+Source: connectpy
+Section: python
+Priority: optional
+Maintainer: connectpy Package Maintainer <cgaffers@gmail.com>
+Build-Depends:
+    debhelper (>= 6.0.0),
+    python-support (>= 0.90),
+    dh-virtualenv (>= 0.6)
+Standards-Version: 3.9.5
+
+Package: connectpy
+Architecture: all
+Pre-Depends: dpkg (>= 1.16.1)
+Depends: ${python:Depends}, ${misc:Depends}
+Description: Client-Server Connect5 Game

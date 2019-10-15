@@ -1,0 +1,33 @@
+version: 2
+jobs:
+  build:
+    docker:
+      
+      - image: circleci/python:3.6.4
+      
+    environment:
+      CIRCLE_ARTIFACTS: /tmp/artifacts
+    steps:
+      - checkout
+      - run: mkdir -p /root/.ssh; chmod 700 /root/.ssh
+      - run:
+          name: Disable StrictHostKeyChecking for github.com
+          command: |
+            cat << 'EOF' >> /root/.ssh/config
+            Host github.com
+                StrictHostKeyChecking no
+            EOF
+      - run: mkdir -p $CIRCLE_ARTIFACTS
+      - run: make install
+      - run: make lint
+      - run: make test
+      - run: make release
+      - run: cp -r cover $CIRCLE_ARTIFACTS
+      - run: cp ../*.deb $CIRCLE_ARTIFACTS
+      - store_artifacts:
+          path: /tmp/artifacts
+      - deploy:
+          name: Try deploying to S3 if tests pass
+          command: |
+            aws s3 sync $CIRCLE_ARTIFACTS s3://project-s3-bucket/ --exclude "*" --include "*.deb"
+            make upload
