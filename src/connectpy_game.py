@@ -59,6 +59,7 @@ class ConnectPyGame(object):
         self.current_turn = None
         self.winner = None
         self.last_drop = None
+        self.closed = False
         self.grid = []
 
     def start_game(self):
@@ -75,6 +76,8 @@ class ConnectPyGame(object):
         self.grid = []
         for row in range(self.rows):
             self.grid.append([0 for column in range(self.columns)])
+        self.last_drop = None
+        self.winner = None
 
     def drop_disc(self, player_id, column_idx):
         player_indicator = self.get_player_indicator(player_id)
@@ -156,6 +159,9 @@ class ConnectPyGame(object):
             raise PlayerInvalidException(
                 "Player ID {} not joined".format(player_id))
 
+    def close(self, player_id):
+        self.closed = player_id
+
     @property
     def players_ready(self):
         return len(self.players) == self.max_players
@@ -168,7 +174,10 @@ class ConnectPyGame(object):
             "players": self.players,
             "winner": self.winner,
             "started": self.started,
-            "last_drop": self.last_drop
+            "last_drop": self.last_drop,
+            "rows": self.rows,
+            "columns": self.columns,
+            "closed": self.closed
         }
 
     def print_grid(self):

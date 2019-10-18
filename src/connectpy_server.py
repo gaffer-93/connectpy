@@ -11,6 +11,8 @@ paths = Blueprint('paths', __name__)
 def game_started(func):
     @wraps(func)
     def decorator(*args, **kwargs):
+        if current_app.game.closed:
+            new_game(current_app)
         if current_app.game.started or current_app.game.players_ready:
             return error_response(
                 "ConnectPy game in progress", status=503)
@@ -78,11 +80,11 @@ def join():
     return ok_response(current_app.game.dict)
 
 
-@paths.route('/status', methods=['GET'])
+@paths.route('/status', methods=['GET', 'POST'])
 @required_fields(['player_id'])
 @player_joined
 def status():
-    return ok_response(current_app.game_dict)
+    return ok_response(current_app.game.dict)
 
 
 @paths.route('/move', methods=['POST'])
@@ -114,10 +116,11 @@ def move():
 @required_fields(['player_id'])
 @player_joined
 def close():
-    new_game(current_app)
+    current_app.game.close(request.player_id)
+    resp = ok_response(current_app.game.dict)
     print("Game closed by {}".format(request.player_id))
 
-    return ok_response({'closed': True})
+    return resp
 
 
 def get_config():
