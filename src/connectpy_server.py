@@ -20,33 +20,77 @@ def game_started(func):
     return decorator
 
 
+def player_joined(func):
+    @wraps(func)
+    def decorator(*args, **kwargs):
+        try:
+            player_id = request.json.get('player_id')
+            current_app.game.get_player_indicator(player_id)
+            request.player_id = player_id
+        except conn_py.PlayerInvalidException as e:
+            return error_response(str(e), status=403)
+        else:
+            resp = func(*args, **kwargs)
+        return resp
+    return decorator
+
+
+def required_fields(fields):
+    def decorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            missing = []
+            if request.mimetype == 'application/json':
+                for field in fields:
+                    try:
+                        setattr(request, field, request.json[field])
+                    except KeyError:
+                        missing.append(field)
+                if missing:
+                    return error_response(
+                        "{} field(s) required".format(','.join(missing)),
+                        status=400)
+            else:
+                return error_response(
+                    "Unsupported Content-Type - expected: application/json",
+                    status=415)
+            resp = func(*args, **kwargs)
+            return resp
+        return wrapper
+    return decorator
+
+
 @paths.route('/join', methods=['POST'])
+@required_fields(['player_id'])
 @game_started
 def join():
-    player_id = request.json['player_id']
-
     try:
-        current_app.game.add_player(player_id)
+        current_app.game.add_player(request.player_id)
     except conn_py.AlreadyJoinedException as e:
         return error_response(str(e), status=409)
     else:
-        print("Player {} connected".format(player_id))
+        print("Player {} connected".format(request.player_id))
 
     if current_app.game.players_ready:
         current_app.game.start_game()
         print("Game started")
+
     return ok_response(current_app.game.dict)
 
 
+@paths.route('/status', methods=['GET'])
+@required_fields(['player_id'])
+@player_joined
+def status():
+    return ok_response(current_app.game_dict)
+
+
 @paths.route('/move', methods=['POST'])
+@required_fields(['player_id', 'column'])
+@player_joined
 def move():
     player_id = request.json['player_id']
     column = request.json['column']
-
-    try:
-        current_app.game.get_player_indicator(player_id)
-    except conn_py.PlayerInvalidException as e:
-        return error_response(str(e), status=403)
 
     if current_app.game.is_turn(player_id):
         try:
@@ -67,11 +111,11 @@ def move():
 
 
 @paths.route('/close', methods=['POST'])
+@required_fields(['player_id'])
+@player_joined
 def close():
-    player_id = request.json['player_id']
-    if current_app.game.started:
-        new_game(current_app)
-    print("Game closed by {}".format(player_id))
+    new_game(current_app)
+    print("Game closed by {}".format(request.player_id))
 
     return ok_response({'closed': True})
 
@@ -98,6 +142,7 @@ def ok_response(data):
     resp.status_code = 200
     return resp
 
+
 def new_game(app):
     app.game = conn_py.ConnectPyGame(app.config)
 
@@ -110,6 +155,7 @@ def create_app():
     new_game(app)
 
     return app
+
 
 if __name__ == '__main__':
     create_app()

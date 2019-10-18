@@ -32,17 +32,10 @@ setup(
     author='Ciaran Gaffney',
     author_email='cgaffers@gmail.com',
     url='https://github.com/gaffer-93/connectpy',
-    py_modules=['connectpy'],
-
-    # Example for a module that's a directory with __init__.py etc.
-    # You'd have this *instead* of py_modules.
-    #packages=[
-    #    'connectpy',
-    #],
-    #package_dir={'connectpy': 'connectpy'},
-
+    packages=['connectpy'],
+    package_dir={'connectpy': 'src'},
     scripts=[
-        #'bin/connectpy',
+        'bin/connectpy_app.py',
     ],
     install_requires=requirements,
     dependency_links=[],
