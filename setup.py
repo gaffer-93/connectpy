@@ -16,12 +16,11 @@ except KeyError:
     version += '0'
 
 requirements = [
-    # TODO: put package requirements here
     'wheel',
-]
-
-test_requirements = [
-    # TODO: put package test requirements here
+    'PyYaml',
+    'raven[flask]',
+    'flask',
+    'uWSGI==2.0.15',
 ]
 
 setup(
@@ -39,7 +38,6 @@ setup(
     ],
     install_requires=requirements,
     dependency_links=[],
-    tests_require=test_requirements,
     test_suite='tests',
     include_package_data=True,
     zip_safe=False,

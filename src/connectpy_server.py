@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import yaml
 import os
 import connectpy.connectpy_game as conn_py

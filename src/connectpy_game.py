@@ -62,6 +62,24 @@ class ConnectPyGame(object):
         self.closed = False
         self.grid = []
 
+    @property
+    def players_ready(self):
+        return len(self.players) == self.max_players
+
+    @property
+    def dict(self):
+        return {
+            "game": self.grid,
+            "turn": self.current_turn,
+            "players": self.players,
+            "winner": self.winner,
+            "started": self.started,
+            "last_drop": self.last_drop,
+            "rows": self.rows,
+            "columns": self.columns,
+            "closed": self.closed
+        }
+
     def start_game(self):
         if self.players_ready:
             self.reset_game()
@@ -162,24 +180,3 @@ class ConnectPyGame(object):
     def close(self, player_id):
         self.closed = player_id
 
-    @property
-    def players_ready(self):
-        return len(self.players) == self.max_players
-
-    @property
-    def dict(self):
-        return {
-            "game": self.grid,
-            "turn": self.current_turn,
-            "players": self.players,
-            "winner": self.winner,
-            "started": self.started,
-            "last_drop": self.last_drop,
-            "rows": self.rows,
-            "columns": self.columns,
-            "closed": self.closed
-        }
-
-    def print_grid(self):
-        for row in self.grid:
-            print(row)
