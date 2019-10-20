@@ -9,14 +9,6 @@ jobs:
       CIRCLE_ARTIFACTS: /tmp/artifacts
     steps:
       - checkout
-      - run: mkdir -p /root/.ssh; chmod 700 /root/.ssh
-      - run:
-          name: Disable StrictHostKeyChecking for github.com
-          command: |
-            cat << 'EOF' >> /root/.ssh/config
-            Host github.com
-                StrictHostKeyChecking no
-            EOF
       - run: mkdir -p $CIRCLE_ARTIFACTS
       - run: make install
       - run: make lint
