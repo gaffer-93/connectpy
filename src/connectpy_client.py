@@ -134,7 +134,7 @@ def print_state_change(player_client):
 
 
 def run_client(
-        server_url='http://localhost:5000', interval=0.5, wait_timeout=30):
+        server_url='http://localhost:80', interval=0.5, wait_timeout=30):
     player_client = None
     while not player_client:
         player_client = try_join_game(server_url)
