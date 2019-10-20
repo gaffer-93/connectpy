@@ -58,7 +58,8 @@ class PlayerClient(object):
             time.sleep(1)
 
     def printable_state(self):
-        s = [['[   ]' if e == 0 else '[ {} ]'.format(play_piece(e)) for e in row]
+        s = [['[   ]' if e == 0
+             else '[ {} ]'.format(play_piece(e)) for e in row]
              for row in self.game_state['game']]
         s.append(['[ {} ]'.format(n + 1) for n in range(
             self.game_state['columns'])])
@@ -72,7 +73,8 @@ class PlayerClient(object):
         while not column:
             try:
                 tcflush(sys.stdin, TCIFLUSH)
-                number = int(input("Pick a column ^, or press 0 to end game: "))
+                number = int(input(
+                    "Pick a column ^, or press 0 to end game: "))
                 if number == 0:
                     self.close_game()
                     column = number
@@ -131,7 +133,8 @@ def print_state_change(player_client):
         print('Waiting for opponent...\r', end="")
 
 
-def run_client(server_url='http://localhost:5000', interval=0.5, wait_timeout=30):
+def run_client(
+        server_url='http://localhost:5000', interval=0.5, wait_timeout=30):
     player_client = None
     while not player_client:
         player_client = try_join_game(server_url)

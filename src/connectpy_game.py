@@ -21,8 +21,11 @@ class AlreadyJoinedException(Exception):
     pass
 
 def window(seq, n):
-    "Returns a sliding window (of width n) over data from the iterable"
-    "   s -> (s0,s1,...s[n-1]), (s1,s2,...,sn), ...                   "
+    """
+    Returns a sliding window (of width n) over data from the iterable
+       s -> (s0,s1,...s[n-1]), (s1,s2,...,sn), ...
+    https://docs.python.org/release/2.3.5/lib/itertools-example.html
+    """
     it = iter(seq)
     result = tuple(islice(it, n))
     if len(result) == n:

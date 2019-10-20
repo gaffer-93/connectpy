@@ -17,8 +17,6 @@ class TestConnectpyServer(flask_testing.TestCase):
         return connectpy_server.create_app()
 
     def setUp(self):
-        # Use import to make flake8 happy with initial tests.
-        dir(connectpy_server)
         self.mock_response = mock.Mock()
         self.mock_game_obj = mock.Mock()
         self.app.game = self.mock_game_obj
@@ -225,3 +223,157 @@ class TestConnectpyGame(unittest.TestCase):
             all([all([n == 0 for n in row]) for row in self.game.grid]))
         self.assertFalse(self.game.last_drop)
         self.assertFalse(self.game.winner)
+
+    def test_drop_disc_bad_move(self):
+        self.game.players = {"a": 1, "b": 2}
+        self.game.start_game()
+
+        with self.assertRaises(connectpy_game.FullColumnException):
+            for _ in range(self.game.rows + 1):
+                self.game.drop_disc("a", 1)
+
+        with self.assertRaises(connectpy_game.ColumnOutOfBoundsException):
+            self.game.drop_disc("a", self.game.columns + 1)
+
+    def test_drop_disc_ok(self):
+        self.game.players = {"a": 1, "b": 2}
+        self.game.start_game()
+
+        for i in range(self.game.columns):
+            # Drop player's discs and check turn is handed over
+            self.game.drop_disc(self.game.current_turn, i)
+            last_turn = self.game.current_turn
+            last_drop = self.game.last_drop
+
+            self.game.drop_disc(self.game.current_turn, i)
+            self.assertFalse(self.game.current_turn == last_turn)
+            self.assertFalse(self.game.last_drop == last_drop)
+
+        self.assertEqual(self.game.winner, "b")
+
+        # Test expected game state - last 2 rows filled with respective player
+        # indicators
+        empty_row = [0 for _ in range(self.game.columns)]
+        expected_state = [empty_row for row in range(self.game.rows)]
+        expected_state[-1] = [1 for _ in range(self.game.columns)]
+        expected_state[-2] = [2 for _ in range(self.game.columns)]
+        self.assertEqual(self.game.grid, expected_state)
+
+    def test_axis_has_winner(self):
+        self.game.win_zone = 5
+        win_axis = [1, 1, 1, 0, 0, 0, 0, 0, 0]
+        self.assertFalse(self.game.axis_has_winner(1, win_axis))
+        win_axis = [1, 1, 1, 1, 1, 0, 0, 0, 0]
+        self.assertTrue(self.game.axis_has_winner(1, win_axis))
+
+    def test_is_winner(self):
+        self.game.win_zone = 5
+
+        no_win_state = [
+            [0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 1, 0, 0, 0, 0, 0, 0],
+            [0, 0, 2, 0, 0, 0, 0, 0, 0],
+            [0, 0, 2, 1, 2, 0, 0, 0, 0],
+            [0, 0, 2, 2, 2, 1, 1, 0, 0],
+            [0, 0, 2, 1, 1, 1, 1, 0, 0]]
+        drop_coords = [4, 6]
+        self.game.grid = no_win_state
+        self.assertFalse(self.game.is_winner(1, drop_coords))
+
+        horizontal_win_state = [
+            [0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 1, 0, 0, 0, 0, 0, 0],
+            [0, 0, 2, 0, 0, 0, 0, 0, 0],
+            [0, 0, 2, 1, 2, 0, 0, 0, 0],
+            [0, 0, 2, 2, 2, 1, 0, 0, 0],
+            [0, 0, 2, 1, 1, 1, 1, 1, 0]]
+        drop_coords = [5, 7]
+        self.game.grid = horizontal_win_state
+        self.assertTrue(self.game.is_winner(1, drop_coords))
+
+        vertical_win_state = [
+            [0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 2, 0, 0, 0, 0, 0, 0],
+            [0, 0, 2, 0, 0, 0, 0, 0, 0],
+            [0, 0, 2, 1, 0, 1, 0, 0, 0],
+            [0, 0, 2, 2, 2, 1, 1, 0, 0],
+            [0, 0, 2, 1, 1, 1, 2, 0, 0]
+        ]
+        drop_coords = [1, 2]
+        self.game.grid = vertical_win_state
+        self.assertTrue(self.game.is_winner(2, drop_coords))
+
+        diagonal_win_state = [
+            [0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 1, 0, 0, 0, 2, 0, 0],
+            [0, 0, 2, 0, 0, 2, 2, 0, 0],
+            [0, 0, 2, 1, 2, 1, 1, 0, 0],
+            [0, 0, 2, 2, 2, 1, 1, 0, 0],
+            [0, 1, 2, 1, 1, 1, 2, 0, 0]
+        ]
+        drop_coords = [1, 6]
+        self.game.grid = diagonal_win_state
+        self.assertTrue(self.game.is_winner(2, drop_coords))
+
+        diagonal_flip_win_state = [
+            [0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 1, 1, 0, 0, 1, 0, 0],
+            [0, 0, 2, 2, 1, 2, 2, 0, 0],
+            [0, 2, 2, 1, 2, 1, 1, 0, 0],
+            [0, 2, 2, 2, 2, 1, 1, 0, 0],
+            [0, 1, 2, 1, 1, 1, 2, 1, 0]
+        ]
+        drop_coords = [5, 7]
+        self.game.grid = diagonal_flip_win_state
+        self.assertTrue(self.game.is_winner(1, drop_coords))
+
+
+    def test_add_player(self):
+        self.game.add_player("a")
+        self.assertFalse(self.game.players_ready)
+        self.assertEqual(self.game.players["a"], 1)
+        self.game.add_player("b")
+        self.assertTrue(self.game.players_ready)
+        self.assertEqual(self.game.players["b"], 2)
+
+    def test_add_player_already_joined(self):
+        self.game.players = {"a": 1}
+        with self.assertRaises(connectpy_game.AlreadyJoinedException):
+            self.game.add_player("a")
+
+    def test_add_player_full_game(self):
+        self.game.players = {"a": 1, "b": 2}
+        with self.assertRaises(connectpy_game.FullGameException):
+            self.game.add_player("a")
+
+    def test_is_turn(self):
+        self.game.current_turn = "a"
+        self.assertFalse(self.game.is_turn("b"))
+        self.assertTrue(self.game.is_turn("a"))
+
+    def test_next_player(self):
+        self.game.players = {"a": 1, "b": 2}
+        self.game.start_game()
+
+        self.assertEqual(self.game.next_player(), "b")
+        self.assertEqual(self.game.next_player(), "a")
+
+    def test_get_player_indicator_not_joined(self):
+        self.game.players = {"a": 1, "b": 2}
+        with self.assertRaises(connectpy_game.PlayerInvalidException):
+            self.game.get_player_indicator("c")
+
+    def test_get_player_indicator(self):
+        self.game.players = {"a": 1, "b": 2}
+        self.assertEqual(
+            self.game.get_player_indicator("a"),
+            self.game.players["a"]
+        )
+
+    def test_close(self):
+        self.game.players = {"a": 1, "b": 2}
+        self.game.start_game()
+        self.game.close("a")
+
+        self.assertEqual(self.game.closed, "a")
+
