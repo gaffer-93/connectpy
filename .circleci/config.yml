@@ -9,7 +9,9 @@ jobs:
       - checkout
       - run: mkdir -p $CIRCLE_ARTIFACTS
       - run: sudo make install
+      - run: pip install tox
       - run: sudo make test
+      - run: sudo apt-get install devscripts
       - run: sudo make release
       - run: cp -r cover $CIRCLE_ARTIFACTS
       - run: cp ../*.deb $CIRCLE_ARTIFACTS

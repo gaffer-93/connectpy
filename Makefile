@@ -36,7 +36,6 @@ clean-test:
 	rm -fr htmlcov/
 
 test:
-	pip install tox
 	tox
 
 coverage:
