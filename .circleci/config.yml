@@ -12,6 +12,7 @@ jobs:
       - run: sudo -E pip install tox
       - run: sudo -E make test
       - run: sudo -E apt-get install devscripts
+      - run: sudo -E apt-get install dh-virtualenv
       - run: sudo -E make release
       - run: cp -r cover $CIRCLE_ARTIFACTS
       - run: cp ../*.deb $CIRCLE_ARTIFACTS

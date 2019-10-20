@@ -2,7 +2,7 @@
 
 #DH_VERBOSE=1
 
-EXTRA_REQUIREMENTS=--preinstall "setuptools>=36" --preinstall "pip>=9" --preinstall=no-manylinux1 --python "/usr/bin/python3.6"
+EXTRA_REQUIREMENTS=--preinstall "setuptools>=36" --preinstall "pip>=9" --preinstall=no-manylinux1 --python "/usr/bin/python3.7"
 DH_VENV_ARGS=--with python-virtualenv --setuptools $(EXTRA_REQUIREMENTS)
 
 %:
