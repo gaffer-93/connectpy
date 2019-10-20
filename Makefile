@@ -8,7 +8,6 @@ help:
 	@echo "clean-build - remove build artifacts"
 	@echo "clean-pyc - remove Python file artifacts"
 	@echo "clean-test - remove test and coverage artifacts"
-	@echo "lint - check style with flake8"
 	@echo "test - run tests quickly with the default Python"
 	@echo "coverage - check code coverage quickly with the default Python"
 	@echo "release - package a release"
@@ -35,9 +34,6 @@ clean-pyc:
 clean-test:
 	rm -f .coverage
 	rm -fr htmlcov/
-
-lint:
-	flake8 connectpy tests
 
 test:
 	tox
