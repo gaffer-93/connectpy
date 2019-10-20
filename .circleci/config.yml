@@ -8,11 +8,11 @@ jobs:
     steps:
       - checkout
       - run: mkdir -p $CIRCLE_ARTIFACTS
-      - run: sudo make install
-      - run: sudo pip install tox
-      - run: sudo make test
-      - run: sudo apt-get install devscripts
-      - run: sudo make release
+      - run: sudo -E make install
+      - run: sudo -E pip install tox
+      - run: sudo -E make test
+      - run: sudo -E apt-get install devscripts
+      - run: sudo -E make release
       - run: cp -r cover $CIRCLE_ARTIFACTS
       - run: cp ../*.deb $CIRCLE_ARTIFACTS
       - store_artifacts:

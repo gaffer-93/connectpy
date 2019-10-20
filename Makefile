@@ -52,10 +52,10 @@ release: clean
 
 
 dist: clean
-	python3.6 setup.py sdist bdist_wheel
+	python3.7 setup.py sdist bdist_wheel
 
 upload: clean
-	python3.6 setup.py sdist bdist_wheel upload -r local
+	python3.7 setup.py sdist bdist_wheel upload -r local
 
 install: clean
 	pip install .
