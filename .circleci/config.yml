@@ -15,12 +15,6 @@ jobs:
       - run: sudo wget http://launchpadlibrarian.net/109052632/python-support_1.0.15_all.deb
       - run: sudo dpkg -i python-support_1.0.15_all.deb
       - run: sudo -E make release
-      - run: cp -r cover $CIRCLE_ARTIFACTS
       - run: cp ../*.deb $CIRCLE_ARTIFACTS
       - store_artifacts:
           path: /tmp/artifacts
-      - deploy:
-          name: Try deploying to S3 if tests pass
-          command: |
-            aws s3 sync $CIRCLE_ARTIFACTS s3://project-s3-bucket/ --exclude "*" --include "*.deb"
-            make upload
