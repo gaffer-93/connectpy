@@ -21,6 +21,7 @@ requirements = [
     'raven[flask]',
     'flask',
     'uWSGI==2.0.15',
+    'requests'
 ]
 
 setup(
