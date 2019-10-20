@@ -10,10 +10,10 @@ jobs:
     steps:
       - checkout
       - run: mkdir -p $CIRCLE_ARTIFACTS
-      - run: make install
-      - run: make lint
-      - run: make test
-      - run: make release
+      - run: sudo make install
+      - run: sudo make lint
+      - run: sudo make test
+      - run: sudo make release
       - run: cp -r cover $CIRCLE_ARTIFACTS
       - run: cp ../*.deb $CIRCLE_ARTIFACTS
       - store_artifacts:
