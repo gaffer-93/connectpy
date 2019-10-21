@@ -168,7 +168,7 @@ class ConnectPyGame(object):
 
     def axis_has_winner(self, player, win_axis):
         """
-        Returns a True if the list `win_axis` contains a chain of indicators of
+        Returns True if the list `win_axis` contains a chain of indicators of
         length `self.win_zone` for `player`
         """
         for seq in window(win_axis, self.win_zone):
@@ -178,7 +178,8 @@ class ConnectPyGame(object):
     def is_winner(self, player, drop_coords):
         """
         Returns True if the matrix `self.grid` contains a chain of indicators
-        of length `self.win_zone` for `player` in any direction.
+        of length `self.win_zone` for `player` in any direction from
+        coordinates `drop_coords`.
         """
         row_idx, column_idx = drop_coords
 
