@@ -13,3 +13,6 @@ To run connectpy_client:
 
 To run tests:
 * $ make test
+
+To check out the CircleCI build history:
+* Go to https://circleci.com/gh/gaffer-93/connectpy 
