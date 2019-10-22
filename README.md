@@ -13,3 +13,9 @@ To run connectpy_client:
 
 To run tests:
 * $ make test
+
+To check out the CircleCI build history:
+* Go to https://circleci.com/gh/gaffer-93/connectpy 
+
+To grab the latest .deb package from CircleCI:
+* Go to https://19-215333119-gh.circle-artifacts.com/0/tmp/artifacts/connectpy_19%2Bmaster_all.deb
